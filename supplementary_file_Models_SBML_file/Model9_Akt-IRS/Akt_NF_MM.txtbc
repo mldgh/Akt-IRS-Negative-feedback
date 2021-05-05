@@ -1,0 +1,126 @@
+********** MODEL NAME
+James-Akt2 model
+
+********** MODEL NOTES
+
+********** MODEL STATE INFORMATION
+
+InsR(0)= 3.59393
+pInsR(0)= 0 
+IRS(0)= 3.59393
+pIRS(0)= 0 
+PIP2(0) = 1450.799 
+PIP3(0) = 0
+PDK1(0) = 2.77
+pmPDK1(0) = 0
+Akt(0) = 607.26 
+pmAkt(0) = 0 
+pmAkt309(0) = 0
+pmAkt474(0) = 0
+pmAkt309474(0) = 0 
+PRAS40(0) = 3.03
+p_PRAS40(0) = 0 
+mTorc2(0) = 0.33
+p_mTorc2(0) = 0
+pmTorc2(0) = 0
+
+
+
+********** MODEL PARAMETERS
+
+kf1 = 288.40315
+Km1 = 5.4200089
+kr1 = 831.76377
+kf2 = 0.73790423
+Km2 = 0.40550854
+ki2a = 0.12302688
+ki2b = 628.05836
+kr2 = 0.033806484
+kf3 = 0.84333476
+Km3 = 0.34914032
+kr3 = 0.71449633
+kf4 = 5559.0426
+kr4 = 76.559661
+kf5 = 0.44157045
+kr5 = 27.415742
+kf6 = 362.243
+Km6 = 37.844258
+kr6 = 12.589254
+kf7 = 0.0033573761
+Km7 = 676.08298
+kr7 = 0.018836491
+Km8 = 100
+Km9 = 0.090782053
+kf10 = 8.8511561
+kr10 = 1.2217997
+kf11a = 153.10875
+kf11b = 8.4333476
+Km11 = 0.004508167
+kr11 = 6025.5959
+kf13a = 0.034994517
+kf13b = 6982.324
+kr13 = 0.021527817
+Km13 = 690.2398
+
+InsB0=0.01 % basal Ins 
+Ins0 = 1
+Timeinput1 = 60000 
+Tinfinput1 = 601  
+
+********** MODEL VARIABLES
+
+Ins=Ins0*piecewiseIQM(1,andIQM(ge(time,Timeinput1),lt(time,Timeinput1+Tinfinput1)),0)
+phosphoAkt309r= pmAkt309 + pmAkt309474;
+phosphoAkt474r = pmAkt474 + pmAkt309474;
+phosphopras40r = p_PRAS40;
+phosphopmAktr = pmAkt;
+amTorc2 = pmTorc2 + p_mTorc2
+
+********** MODEL REACTIONS
+
+InsR => pInsR: R1
+	vf = kf1 * InsR*(Ins+InsB0)/(Km1 + InsR) - kr1*pInsR 
+
+IRS => pIRS : R2
+	vf = kf2*IRS*pInsR/((Km2 + IRS)*(1+ (ki2a*pmAkt309 + ki2b*pmAkt309474))) - kr2*pIRS
+
+PIP2 => PIP3:R3
+    vf = kf3*PIP2*pIRS/(Km3 + PIP2) - kr3*PIP3
+
+PDK1 + PIP3 => pmPDK1:R4
+    vf = kf4*PDK1*PIP3 - kr4 * pmPDK1
+
+Akt + PIP3 => pmAkt: R5
+    vf = kf5*Akt*PIP3  - kr5 * pmAkt
+ 
+pmAkt=> pmAkt309 : R6
+    vf = kf6*pmAkt*pmPDK1/ (Km6 +pmAkt) -kr6*pmAkt309
+ 
+pmAkt=> pmAkt474 : R7
+    vf = kf7 * pmAkt * amTorc2 / (Km7 + pmAkt) - kr7 * pmAkt474
+ 
+pmAkt309  => pmAkt309474 : R8
+    vf = kf7 * pmAkt309 * amTorc2 / (Km8 + pmAkt309) - kr7 * pmAkt309474
+ 
+pmAkt474 => pmAkt309474 : R9
+    vf = kf6 * pmAkt474 * pmPDK1 / (Km9 + pmAkt474) - kr6 * pmAkt309474
+ 
+mTorc2 + PIP3 => pmTorc2 : R10
+    vf = kf10*mTorc2*PIP3 - kr10 * pmTorc2 
+ 
+mTorc2 => p_mTorc2 : R11
+    vf = mTorc2*(kf11a*pmAkt309 + kf11b*pmAkt309474)/(Km11 + mTorc2) -kr11 * p_mTorc2 
+  
+PRAS40 => p_PRAS40: R13
+    vf = PRAS40*(kf13a*pmAkt309 + kf13b*pmAkt309474)/(Km13 + PRAS40)-kr13*p_PRAS40
+
+
+
+********** MODEL FUNCTIONS
+
+
+********** MODEL EVENTS
+
+
+********** MODEL MATLAB FUNCTIONS
+
